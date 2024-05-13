@@ -1,5 +1,8 @@
 package com.example.myapplication.data
 
+import androidx.room.Entity
+
+@Entity(tableName = "activity-table")
 data class ActivityItem(
     val id : Int = 0,
     var title : String = "",
