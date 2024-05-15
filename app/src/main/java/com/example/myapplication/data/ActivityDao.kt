@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class ActivityDao {
@@ -12,10 +13,10 @@ abstract class ActivityDao {
     abstract suspend fun addActivity(activityEntity : ActivityItem)
 
     @Query("Select * From `activity-table`")
-    abstract fun getAllActivities() : List<ActivityItem>
+    abstract fun getAllActivities() : Flow<List<ActivityItem>>
 
     @Query("Select * From `activity-table` Where id=:id")
-    abstract fun getActivityById(id:Int) : List<ActivityItem>
+    abstract fun getActivityById(id:Int) : Flow<ActivityItem>
 
     @Update
     abstract suspend fun updateActivity(activityEntity: ActivityItem)

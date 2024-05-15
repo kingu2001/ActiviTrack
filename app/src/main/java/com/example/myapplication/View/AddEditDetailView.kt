@@ -9,14 +9,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Button
+import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -25,25 +28,39 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.example.myapplication.R
 import com.example.myapplication.ViewModel.ActivityViewModel
+import com.example.myapplication.data.ActivityItem
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun AddEditDetailView(
     id: Int,
     viewModel: ActivityViewModel,
-    navigation: Navigation
+    navController: NavController
 ) {
     val snackMessage = remember{
         mutableStateOf("")
     }
 
+    val scope = rememberCoroutineScope()
+    val scaffoldState = rememberScaffoldState()
+
     if(id != 0){
-        val activity = viewModel.ge
+        val activity = viewModel.getActivityById(id).collectAsState(initial = ActivityItem(0, "", ""))
+        viewModel.activityTitleState = activity.value.title
+        viewModel.activityDescriptionState = activity.value.description
+    }
+    else{
+        viewModel.activityTitleState = ""
+        viewModel.activityDescriptionState = ""
     }
 
 
@@ -53,8 +70,10 @@ fun AddEditDetailView(
                 title =
                 if (id != 0) stringResource(id = R.string.update_activity)
                 else stringResource(id = R.string.add_activity)
-            )
-        })
+            ){
+                navController.navigateUp()
+            }
+        }, scaffoldState = scaffoldState)
     {
         Column(
             modifier = Modifier
@@ -66,9 +85,52 @@ fun AddEditDetailView(
             Spacer(modifier = Modifier.height(10.dp))
             ActivityTextField(
                 label = "Title",
-                value = ,
-                onValueChanged =
+                value = viewModel.activityTitleState,
+                onValueChanged = {viewModel.onActivityTitleChanged(it)}
             )
+
+            ActivityTextField(
+                label = "Description",
+                value = viewModel.activityDescriptionState,
+                onValueChanged = {viewModel.onActivityDescriptionChanged(it)})
+
+            Spacer(modifier = Modifier.height(10.dp))
+            Button(onClick = {
+                if(viewModel.activityTitleState.isNotEmpty() && viewModel.activityDescriptionState.isNotEmpty()){
+                    if(id != 0){
+                        viewModel.updateActivity(
+                            ActivityItem(
+                                id = id,
+                                title = viewModel.activityTitleState.trim(),
+                                description = viewModel.activityDescriptionState.trim()
+                            )
+                        )
+                    }
+                    else{
+                        viewModel.addActivity(
+                            ActivityItem(
+                                title = viewModel.activityTitleState.trim(),
+                                description = viewModel.activityDescriptionState.trim()
+                            )
+                        )
+                        snackMessage.value = "Activity has been created."
+                    }
+                }
+                else{
+                    snackMessage.value = "Enter fields to create an activity."
+                }
+
+                scope.launch {
+                    scaffoldState.snackbarHostState.showSnackbar(snackMessage.value)
+                    navController.navigateUp()
+                }
+            }){
+                Text(
+                    text = if(id != 0) stringResource(id = R.string.update_activity)
+                    else stringResource(id = R.string.add_activity),
+                    style = TextStyle(fontSize = 18.sp)
+                )
+            }
         }
     }
 }
@@ -95,3 +157,5 @@ fun ActivityTextField(
         )
     )
 }
+
+

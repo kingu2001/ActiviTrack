@@ -5,6 +5,7 @@ import androidx.room.Room
 
 object Graph {
     lateinit var database : ActivityDatabase
+
     val activityRepository by lazy{
         ActivityRepository(activityDao = database.activityDao())
     }

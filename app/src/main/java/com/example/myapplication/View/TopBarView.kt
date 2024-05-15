@@ -28,7 +28,7 @@ fun TopBarView(
     //To see whether it is visible or not
     val navigationIcon : (@Composable () -> Unit) =
         {
-            if(!title.contains("WishList")){
+            if(!title.contains("ActivityList")){
                 IconButton(onClick = { onBackNavClicked() }) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,

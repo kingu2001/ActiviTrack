@@ -53,9 +53,15 @@ android {
 dependencies {
     //Implements navigation
     val nav_version = "2.7.7"
-    implementation("androidx.navigation:navigation-compose:$nav_version")
-
     val room = "2.6.0"
+    val compose_version = "1.6.0-alpha08"
+
+    //Navigation
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+    implementation("androidx.compose.ui:ui:$compose_version")
+    implementation("androidx.compose.material:material:$compose_version")
+    implementation("androidx.compose.ui:ui-tooling-preview:$compose_version")
+
     //Room
     implementation("androidx.room:room-runtime:$room")
     implementation("androidx.room:room-ktx:$room")

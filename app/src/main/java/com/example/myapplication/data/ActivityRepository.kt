@@ -1,13 +1,15 @@
 package com.example.myapplication.data
 
+import kotlinx.coroutines.flow.Flow
+
 class ActivityRepository(val activityDao: ActivityDao) {
     suspend fun addActivity(activityItem: ActivityItem) {
         activityDao.addActivity(activityItem)
     }
 
-    fun getActivity(): List<ActivityItem> = activityDao.getAllActivities()
+    fun getActivity(): Flow<List<ActivityItem>> = activityDao.getAllActivities()
 
-    fun getActivityById(id: Int): List<ActivityItem> {
+    fun getActivityById(id: Int): Flow<ActivityItem> {
         return activityDao.getActivityById(id)
     }
 
